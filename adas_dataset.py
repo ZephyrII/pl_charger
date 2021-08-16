@@ -30,7 +30,7 @@ class AdasDataset(Dataset):
 
     def __getitem__(self, idx):
         img_path = self.img_labels[idx]["img_path"]
-        image = read_image(img_path)
+        image = read_image(img_path).float()/255
         label = self.generate_target(idx)
         return image, label
 
@@ -43,7 +43,7 @@ class AdasDataset(Dataset):
         size = root.find('size')
         w = int(size.find('width').text)
         h = int(size.find('height').text)
-        kp_maps = np.zeros((self.num_points, w, h), dtype=np.int32)
+        kp_maps = np.zeros((self.num_points, w, h), dtype=np.float32)
         obj = root.findall('object')[0]
         kps = obj.find('keypoints')
         for i in range(self.num_points):
@@ -56,11 +56,11 @@ class AdasDataset(Dataset):
             cv2.circle(kp_maps[i], point_center, point_size, 255, -1)
             # TODO: verify label corrrectness
             image = read_image(self.img_labels[image_id]['img_path'])
-            kap = kp_maps[i].astype(np.float32) / 255
-            kap = cv2.cvtColor(kap, cv2.COLOR_GRAY2BGR)
-            alpha = 0.8
-            out = cv2.addWeighted(image, alpha, kap, 1 - alpha, 0.0)
-            cv2.imshow('xddlol', out)
-            cv2.waitKey(0)
+            # kap = kp_maps[i].astype(np.float32) / 255
+            # kap = cv2.cvtColor(kap, cv2.COLOR_GRAY2BGR)
+            # alpha = 0.8
+            # out = cv2.addWeighted(image, alpha, kap, 1 - alpha, 0.0)
+            # cv2.imshow('xddlol', out)
+            # cv2.waitKey(0)
 
-        return kp_maps, keypoints
+        return torch.Tensor(kp_maps/255)#, torch.Tensor(keypoints)
