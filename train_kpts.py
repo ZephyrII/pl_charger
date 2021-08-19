@@ -147,7 +147,6 @@ if __name__ == '__main__':
     experiment_name="res50",  
     # experiment_id='CHAR-1',
 )
-    # dataset = ChargerData("/root/share/tf/dataset/4_point_final/")
     ch_call = pl.callbacks.ModelCheckpoint(save_last=True, dirpath="./checkpoints", every_n_epochs=1)
     trainer = pl.Trainer(gpus=1, checkpoint_callback=True, callbacks=[ch_call], accumulate_grad_batches=4, logger=neptune_logger)
     model = ChargerKpts("/root/share/tf/dataset/final_localization/tape_1.0/")
