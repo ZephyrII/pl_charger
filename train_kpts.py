@@ -118,17 +118,17 @@ class ChargerKpts(pl.LightningModule):
         return torch.optim.Adam(self.parameters(), lr=self.hparams.learning_rate)
 
     def train_dataloader(self):
-        return DataLoader(AdasDataset(self.ds_path, "train"), batch_size=self.batch_size, num_workers=3)
+        return DataLoader(AdasDataset(self.ds_path, "train"), batch_size=self.batch_size, num_workers=2, pin_memory=True)
 
     def val_dataloader(self):
-        return DataLoader(AdasDataset(self.ds_path, "val"), batch_size=self.batch_size, num_workers=3)
+        return DataLoader(AdasDataset(self.ds_path, "val"), batch_size=self.batch_size, num_workers=2, pin_memory=True)
 
     def test_dataloader(self):
-        return DataLoader(AdasDataset(self.ds_path, "val"), batch_size=self.batch_size, num_workers=3)
+        return DataLoader(AdasDataset(self.ds_path, "val"), batch_size=self.batch_size, num_workers=2, pin_memory=True)
 
 if __name__ == '__main__':
     # dataset = ChargerData("/root/share/tf/dataset/4_point_final/")
-    ch_call = pl.callbacks.ModelCheckpoint(save_last=True)
+    ch_call = pl.callbacks.ModelCheckpoint(every_n_epochs=1, save_last=True, dirpath='/root/share/tf/pl_checkpoints/res_50/')
     trainer = pl.Trainer(gpus=1, checkpoint_callback=True, callbacks=[ch_call], accumulate_grad_batches=4)
-    model = ChargerKpts("/root/share/tf/dataset/4_point_final/")
+    model = ChargerKpts("/root/share/tf/dataset/final_localization/tape_1.0/")
     trainer.fit(model)
